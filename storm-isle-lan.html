@@ -303,7 +303,7 @@ function startMode(){mode=MODES[msel];W=mode.W;clearWorld();if(mode.lan)rf=seede
  if(run){mkRun(curMap);MODES.run.win=curMap.win}else if(mode.br)mkBR();else{mkTrees(Math.round(mode.trees*curMap.tm),W);mkHouses(mode.houses,W);mkRocks(Math.round(W/9*curMap.rk),W)}rf=Math.random}
 const mb=$('modes');
 const CATS=['Casual','Battle Royale','Ranked','1v1','Other'];let curCat='Casual';
-function drawCats(){const e=$('cats');e.innerHTML='';CATS.forEach(c=>{const b=document.createElement('button');b.className='mode'+(c===curCat?' on':'');b.textContent=c;b.onclick=()=>{const f=Object.values(MODES).find(m=>m.cat===c&&(!m.lan||location.protocol!=='https:'));if(f)pick(f.id)};e.appendChild(b)});[...mb.children].forEach(b=>b.style.display=MODES[b.dataset.id].cat===curCat?'':'none')}
+function drawCats(){const e=$('cats');e.innerHTML='';CATS.forEach(c=>{const b=document.createElement('button');b.className='mode'+(c===curCat?' on':'');b.textContent=c;b.onclick=()=>{const f=Object.values(MODES).find(m=>m.cat===c&&true);if(f)pick(f.id)};e.appendChild(b)});[...mb.children].forEach(b=>b.style.display=MODES[b.dataset.id].cat===curCat?'':'none')}
 function pick(id){msel=id;curCat=MODES[id].cat||'Casual';drawCats();$('lanrow').style.display=MODES[id].lan?'flex':'none';mapIdx=MODES[id].mp==='R'?0:-1;drawMaps();$('tip').textContent=MODES[id].tip;[...mb.children].forEach(c=>c.classList.toggle('on',c.dataset.id===id))}
 Object.values(MODES).filter(m=>!m.lan||location.protocol!=='https:').forEach(m=>{const b=document.createElement('button');b.className='mode';b.dataset.id=m.id;b.textContent=m.name;b.onclick=()=>pick(m.id);mb.appendChild(b)});pick('classic');
 const GUNS={blaster:{name:'Blaster',dmg:25,rate:.22,spr:0,col:0xffe14d,len:.8},
@@ -427,7 +427,7 @@ function netClose(){if(net){const n=net;net=null;try{n.close()}catch(e){}}remote
 const hitAny=(b,d)=>b.remote?netSend({t:'hit',to:b.id,dmg:d}):dmgBot(b,d);
 function addRemote(p){if(remotes.some(r=>r.id===p.id))return;const sk=skin(p.skin);remotes.push({remote:1,id:p.id,x:0,y:0,z:0,tx:0,ty:0,tz:0,yaw:0,tyaw:0,mv:0,sl:0,mesh:person(sk),fresh:1})}
 function lanConnect(cb){const host=$('lanip').value.trim()||location.host;if(!host){say('Type the host address first, like 192.168.1.5:3000',4500);return}
- let ws;try{ws=new WebSocket('ws://'+host+'/ws')}catch(e){say('That address does not look right',4000);return}
+ let ws;try{ws=new WebSocket((location.protocol==='https:'?'wss://':'ws://')+host+'/ws')}catch(e){say('That address does not look right',4000);return}
  const to=setTimeout(()=>{if(ws.readyState!==1){try{ws.close()}catch(e){}say('Could not connect. Is the host running server.js?',4500)}},4000);
  ws.onopen=()=>{clearTimeout(to);net=ws;ws.send(JSON.stringify({t:'join',skin:SV.eq,room:MODES[msel].room||'ffa'}))};
  ws.onmessage=e=>onNet(JSON.parse(e.data),cb);
